@@ -20,7 +20,7 @@ if err != nil {
 defer db.Close()
 ```
 	
-Then create a new SqlKv object and pass it the db connection and the table name:
+Then create a new SqlKv object and pass it the db connection and the table name. The table will automatically be created if it does not already exist.
 
 ```go
 store := sqlkv.New(db, "kvstore")
