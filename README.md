@@ -46,6 +46,10 @@ If a key is missing, each Get method will return Golang's default zero value for
 
 You can use `HasKey` to check if a key really exist. The method `Del` is also available to delete a key.
 
+# API reference
+
+http://godoc.org/github.com/laurent22/go-sqlkv
+
 # Full example
 
 ```go
