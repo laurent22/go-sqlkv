@@ -12,15 +12,19 @@ It can be used, for example, to easily store configuration values in Sqlite, or 
 
 The first step is to initialize a new database connection. The package expects the connection to remain open while being used. For example, using Sqlite:
 
-	db, err := sql.Open("sqlite3", "example.db")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+```go
+db, err := sql.Open("sqlite3", "example.db")
+if err != nil {
+	panic(err)
+}
+defer db.Close()
+```
 	
 Then create a new SqlKv object and pass it the db connection and the table name:
 
-	store := sqlkv.New(db, "kvstore")
+```go
+store := sqlkv.New(db, "kvstore")
+```
 	
 You can then Get/Set values using the provided methods:
 
@@ -44,50 +48,52 @@ You can use `HasKey` to check if a key really exist. The method `Del` is also av
 
 # Full example
 
-	package main
+```go
+package main
 
-	import (
-		"database/sql"
-		"fmt"
-		"os"
-		"time"
-		
-		_ "github.com/laurent22/go-sqlkv"
-		_ "github.com/mattn/go-sqlite3"	
-	)
+import (
+	"database/sql"
+	"fmt"
+	"os"
+	"time"
+	
+	_ "github.com/laurent22/go-sqlkv"
+	_ "github.com/mattn/go-sqlite3"	
+)
 
-	func main() {
-		os.Remove("example.db")
-		db, err := sql.Open("sqlite3", "example.db")
-		if err != nil {
-			panic(err)
-		}
-		defer db.Close()
-		
-		store := sqlkv.New(db, "kvstore")
-		
-		store.SetString("username", "John")
-		fmt.Println(store.GetString("username"))
-		
-		store.SetInt("age", 25)
-		fmt.Println(store.GetInt("age"))
-		
-		store.SetFloat("pi", 3.14)
-		fmt.Println(store.GetFloat("pi"))	
-
-		store.SetTime("today", time.Now())
-		fmt.Println(store.GetTime("today"))	
-		
-		store.SetBool("enabled", true)
-		fmt.Println(store.GetBool("enabled"))
-
-		fmt.Println(store.HasKey("username"))
-		
-		store.Del("username")
-		fmt.Println(store.GetString("username"))
-
-		fmt.Println(store.HasKey("username"))	
+func main() {
+	os.Remove("example.db")
+	db, err := sql.Open("sqlite3", "example.db")
+	if err != nil {
+		panic(err)
 	}
+	defer db.Close()
+	
+	store := sqlkv.New(db, "kvstore")
+	
+	store.SetString("username", "John")
+	fmt.Println(store.GetString("username"))
+	
+	store.SetInt("age", 25)
+	fmt.Println(store.GetInt("age"))
+	
+	store.SetFloat("pi", 3.14)
+	fmt.Println(store.GetFloat("pi"))	
+
+	store.SetTime("today", time.Now())
+	fmt.Println(store.GetTime("today"))	
+	
+	store.SetBool("enabled", true)
+	fmt.Println(store.GetBool("enabled"))
+
+	fmt.Println(store.HasKey("username"))
+	
+	store.Del("username")
+	fmt.Println(store.GetString("username"))
+
+	fmt.Println(store.HasKey("username"))	
+}
+```
 
 # License
 
