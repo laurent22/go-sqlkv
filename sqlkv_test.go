@@ -67,21 +67,21 @@ func Test_GetSetString(t *testing.T) {
 	defer clearStore(store)
 	
 	store.SetString("test", "abcd")
-	value := store.GetString("test")
+	value := store.String("test")
 	if value != "abcd" {
 		t.Errorf("Expected 'abcd', got '%s'", value)
 	}
 	
 	store.SetString("test", "1234")
-	value = store.GetString("test")
+	value = store.String("test")
 	if value != "1234" {
 		t.Errorf("Expected '1234', got '%s'", value)
 	}
 
 	store.db.Close()
 	
-	defer panicHandler(t, "GetString: database is closed")
-	store.GetString("test")
+	defer panicHandler(t, "String: database is closed")
+	store.String("test")
 
 	defer panicHandler(t, "SetString: database is closed")
 	store.SetString("test", "panic")
@@ -92,15 +92,15 @@ func Test_GetSetInt(t *testing.T) {
 	defer clearStore(store)
 
 	store.SetInt("test", 1234)
-	i := store.GetInt("test")
+	i := store.Int("test")
 	if i != 1234 {
 		t.Errorf("Expected 1234, got %d", i)
 	}
 	
 	store.SetString("test", "abcd")
 
-	defer panicHandler(t, "GetInt: not a number")
-	store.GetInt("test")
+	defer panicHandler(t, "Int: not a number")
+	store.Int("test")
 }
 
 func Test_GetSetFloat(t *testing.T) {
@@ -108,33 +108,33 @@ func Test_GetSetFloat(t *testing.T) {
 	defer clearStore(store)
 
 	store.SetFloat("test", 1234.567)
-	f := store.GetFloat("test")
+	f := store.Float("test")
 	if f != 1234.567 {
 		t.Errorf("Expected 1234.567, got %f", f)
 	}
 	
 	store.SetString("test", "abcd")
 
-	defer panicHandler(t, "GetFloat: not a number")
-	store.GetFloat("test")
+	defer panicHandler(t, "Float: not a number")
+	store.Float("test")
 }
 
 func TestGetSetBool(t *testing.T) {
 	store := getStore()
 	defer clearStore(store)
 
-	b := store.GetBool("nothere")
+	b := store.Bool("nothere")
 	if b {
 		t.Error("Expected false, got true")
 	}
 	
 	store.SetBool("test", true)
-	if !store.GetBool("test") {
+	if !store.Bool("test") {
 		t.Error("Expected true, got false")
 	}
 	
 	store.SetBool("test", false)
-	if store.GetBool("test") {
+	if store.Bool("test") {
 		t.Error("Expected false, got true")
 	}
 }
@@ -143,22 +143,22 @@ func Test_GetSetTime(t *testing.T) {
 	store := getStore()
 	defer clearStore(store)
 
-	v := store.GetTime("nothere")
+	v := store.Time("nothere")
 	if !v.IsZero() {
 		t.Errorf("Expected zero value, got %s", t)
 	}
 
 	now := time.Now()
 	store.SetTime("test", now)
-	v = store.GetTime("test")
+	v = store.Time("test")
 	if v != now {
 		t.Errorf("Expected %s, got %s", now, v)
 	}
 	
 	store.SetString("test", "not a date")
 
-	defer panicHandler(t, "GetTime: not a date")
-	store.GetTime("test")
+	defer panicHandler(t, "Time: not a date")
+	store.Time("test")
 }
 
 func Test_Del(t *testing.T) {
@@ -171,7 +171,7 @@ func Test_Del(t *testing.T) {
 	store.SetString("test", "abcd")
 	store.Del("test")
 	
-	value := store.GetString("test")
+	value := store.String("test")
 	if value != "" {
 		t.Errorf("Expected '', got '%s'", value)
 	}

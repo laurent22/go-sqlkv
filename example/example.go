@@ -21,24 +21,24 @@ func main() {
 	store := sqlkv.New(db, "kvstore")
 	
 	store.SetString("username", "John")
-	fmt.Println(store.GetString("username"))
+	fmt.Println(store.String("username"))
 	
 	store.SetInt("age", 25)
-	fmt.Println(store.GetInt("age"))
+	fmt.Println(store.Int("age"))
 	
 	store.SetFloat("pi", 3.14)
-	fmt.Println(store.GetFloat("pi"))	
+	fmt.Println(store.Float("pi"))	
 
 	store.SetTime("today", time.Now())
-	fmt.Println(store.GetTime("today"))	
+	fmt.Println(store.Time("today"))	
 	
 	store.SetBool("enabled", true)
-	fmt.Println(store.GetBool("enabled"))
+	fmt.Println(store.Bool("enabled"))
 
 	fmt.Println(store.HasKey("username"))
 	
 	store.Del("username")
-	fmt.Println(store.GetString("username"))
+	fmt.Println(store.String("username"))
 
 	fmt.Println(store.HasKey("username"))	
 }

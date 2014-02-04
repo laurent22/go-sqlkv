@@ -68,7 +68,7 @@ func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
 	return row, nil
 }
 
-func (this *SqlKv) GetString(name string) string {
+func (this *SqlKv) String(name string) string {
 	row, err := this.rowByName(name)
 	if err == nil && row == nil {
 		return ""
@@ -103,8 +103,8 @@ func (this *SqlKv) SetString(name string, value string) {
 	}
 }
 
-func (this *SqlKv) GetInt(name string) int {
-	s := this.GetString(name)
+func (this *SqlKv) Int(name string) int {
+	s := this.String(name)
 	if s == "" {
 		return 0
 	}
@@ -122,8 +122,8 @@ func (this *SqlKv) SetInt(name string, value int) {
 	this.SetString(name, s)
 }
 
-func (this *SqlKv) GetFloat(name string) float32 {
-	s := this.GetString(name)
+func (this *SqlKv) Float(name string) float32 {
+	s := this.String(name)
 	if s == "" {
 		return 0
 	}
@@ -140,8 +140,8 @@ func (this *SqlKv) SetFloat(name string, value float32) {
 	this.SetString(name, s)
 }
 
-func (this *SqlKv) GetBool(name string) bool {
-	s := this.GetString(name)
+func (this *SqlKv) Bool(name string) bool {
+	s := this.String(name)
 	return s == "1" || strings.ToLower(s) == "true"
 }
 
@@ -155,8 +155,8 @@ func (this *SqlKv) SetBool(name string, value bool) {
 	this.SetString(name, s)
 }
 
-func (this *SqlKv) GetTime(name string) time.Time {
-	s := this.GetString(name)
+func (this *SqlKv) Time(name string) time.Time {
+	s := this.String(name)
 	if s == "" {
 		return time.Time{}
 	}
