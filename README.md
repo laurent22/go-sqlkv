@@ -1,8 +1,8 @@
-# SQL-based key/value store for Golang
+# An SQL-based key/value store for Golang
 
 SqlKv provides an SQL-based key/value store for Golang. It can work with any of the database type supported by the built-in database/sql package.
 
-It can be used, for example, to easily store configuration values in Sqlite, or to build a simple caching system when something like memcached or Redis is not available.
+It can be used, for example, to easily store configuration values in Sqlite, or to build a simple caching system when something more advanced like memcached or Redis is not available.
 
 # Installation
 
@@ -18,7 +18,7 @@ The first step is to initialize a new database connection. The package expects t
 	}
 	defer db.Close()
 	
-Then create a new SqlKv object:
+Then create a new SqlKv object and pass it the db connection and the table name:
 
 	store := sqlkv.New(db, "kvstore")
 	
