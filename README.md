@@ -2,9 +2,7 @@
 
 SqlKv provides an SQL-based key/value store for Golang. It can work with any of the database type supported by the built-in database/sql package.
 
-It can be used, for example, to easily store configuration values in Sqlite.
-
-It can also be used to build a simple caching system when something like memcached or Redis is not available.
+It can be used, for example, to easily store configuration values in Sqlite, or to build a simple caching system when something like memcached or Redis is not available.
 
 # Installation
 
@@ -12,7 +10,7 @@ It can also be used to build a simple caching system when something like memcach
 	
 # Usage
 
-The first step is to initialize a new database connection. The package expects the connection to remain open while being used.
+The first step is to initialize a new database connection. The package expects the connection to remain open while being used. For example, using Sqlite:
 
 	db, err := sql.Open("sqlite3", "example.db")
 	if err != nil {
@@ -26,21 +24,23 @@ Then create a new SqlKv object:
 	
 You can then Get/Set values using the provided methods:
 
-- GetString / SetString
-- GetInt / SetInt
-- GetFloat / SetFloat
-- GetBool / SetBool
-- GetTime / SetTime
+- `GetString` / `SetString`
+- `GetInt` / `SetInt`
+- `GetFloat` / `SetFloat`
+- `GetBool` / `SetBool`
+- `GetTime` / `SetTime`
 
-In order to keep the API simple, all the errors are handled internally when possible. If an error cannot be handled (eg. cannot read or write to the database), the methods will panic.
+In order to keep the API simple, all the errors are handled internally when possible. If an error cannot be handled (eg. cannot read or write to the database), the method will panic.
 
-If a key is missing, each method will return Golang's default zero value for this type. The zero values are:
+If a key is missing, each Get method will return Golang's default zero value for this type. The zero values are:
 
 - String: ""
 - Int: 0
 - Float: 0
 - Bool: false
 - Time: time.Time{} (Test with time.IsZero())
+
+You can use `HasKey` to check if a key really exist. The method `Del` is also available to delete a key.
 
 # Full example
 
