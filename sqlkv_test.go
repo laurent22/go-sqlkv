@@ -5,14 +5,14 @@ import (
 	"os"
 	"testing"
 	"time"
-	
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func getStore() *SqlKv {
 	var err error
 	var db *sql.DB
-	
+
 	os.Mkdir("test", 0777)
 
 	os.Remove("test/database.db")
@@ -20,8 +20,8 @@ func getStore() *SqlKv {
 	if err != nil {
 		panic(err)
 	}
-	
-	return New(db, "kvstore")	
+
+	return New(db, "kvstore")
 }
 
 func clearStore(store *SqlKv) {
@@ -42,11 +42,11 @@ func noPanicHandler(t *testing.T, message string) {
 }
 
 func Test_New(t *testing.T) {
-  store := getStore()
-  if !store.createTableCalled {
-    t.Error("Expected createTable to have been called, and it was not")
-  }
-  clearStore(store)
+	store := getStore()
+	if !store.createTableCalled {
+		t.Error("Expected createTable to have been called, and it was not")
+	}
+	clearStore(store)
 }
 
 func Test_createTable(t *testing.T) {

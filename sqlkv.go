@@ -8,13 +8,13 @@ import (
 )
 
 type SqlKv struct {
-	db *sql.DB
-	tableName string
+	db                *sql.DB
+	tableName         string
 	createTableCalled bool
 }
 
 type SqlKvRow struct {
-	name string
+	name  string
 	value string
 }
 
@@ -24,10 +24,10 @@ func New(db *sql.DB, tableName string) *SqlKv {
 	output.tableName = tableName
 	output.createTableCalled = false
 
-  err := output.createTable()
-  if err != nil {
-    panic(err)
-  }
+	err := output.createTable()
+	if err != nil {
+		panic(err)
+	}
 
 	return output
 }
@@ -52,13 +52,13 @@ func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
 	query := "SELECT name, `value` FROM " + this.tableName + " WHERE name = ?"
 	err := this.db.QueryRow(query, name).Scan(&row.name, &row.value)
 
-  if err != nil {
-    if err == sql.ErrNoRows {
-      return nil, nil
-    } else {
-      return nil, err
-    }
-  }
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		} else {
+			return nil, err
+		}
+	}
 
 	return row, nil
 }
@@ -86,7 +86,7 @@ func (this *SqlKv) SetString(name string, value string) {
 
 	_, err = this.db.Exec(query, value, name)
 
-  if err != nil {
+	if err != nil {
 		panic(err)
 	}
 }
