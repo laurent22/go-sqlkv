@@ -44,7 +44,7 @@ If a key is missing, each Get method will return Golang's default zero value for
 - Bool: false
 - Time: time.Time{} (Test with `time.IsZero()`)
 
-You can use `HasKey` to check if a key really exist. The method `Del` is also available to delete a key.
+You can use `HasKey` to check if a key really exists. The method `Del` is also available to delete a key.
 
 # API reference
 
