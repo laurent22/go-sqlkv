@@ -31,8 +31,9 @@ func (this *SqlKv) createTable() error {
 		return err
 	}
 	
-	_, err = this.db.Exec("CREATE INDEX name_index ON " + this.tableName + " (name)")
-	return err
+	// Ignore error here since there will be one if the index already exists
+	this.db.Exec("CREATE INDEX name_index ON " + this.tableName + " (name)")
+	return nil
 }
 
 func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
