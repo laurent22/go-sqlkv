@@ -1,6 +1,6 @@
 # An SQL-based key/value store for Golang
 
-SqlKv provides an SQL-based key/value store for Golang. It can work with any of the database type supported by the built-in database/sql package.
+SqlKv provides an SQL-based key/value store for Golang. It can work with any of the database types supported by the built-in `database/sql` package.
 
 It can be used, for example, to easily store configuration values in Sqlite, or to build a simple caching system when something more advanced like memcached or Redis is not available.
 
@@ -20,7 +20,7 @@ if err != nil {
 defer db.Close()
 ```
 	
-Then create a new SqlKv object and pass it the db connection and the table name:
+Then create a new SqlKv object and pass it the db connection and the table name. The table will automatically be created if it does not already exist.
 
 ```go
 store := sqlkv.New(db, "kvstore")
@@ -45,6 +45,10 @@ If a key is missing, each Get method will return Golang's default zero value for
 - Time: time.Time{} (Test with `time.IsZero()`)
 
 You can use `HasKey` to check if a key really exist. The method `Del` is also available to delete a key.
+
+# API reference
+
+http://godoc.org/github.com/laurent22/go-sqlkv
 
 # Full example
 
