@@ -31,13 +31,13 @@ func clearStore(store *SqlKv) {
 
 func panicHandler(t *testing.T, message string) {
 	if r := recover(); r == nil {
-		t.Error("%s: Expected call to panic, but it didn't", message)
+		t.Errorf("%s: Expected call to panic, but it didn't", message)
 	}
 }
 
 func noPanicHandler(t *testing.T, message string) {
 	if r := recover(); r != nil {
-		t.Error("%s: Expected call to not panic, but it did", message)
+		t.Errorf("%s: Expected call to not panic, but it did", message)
 	}
 }
 
@@ -60,6 +60,40 @@ func Test_createTable(t *testing.T) {
 	}
 	
 	clearStore(store)
+}
+
+func Test_rowByName(t *testing.T) {
+	store := getStore()
+	defer clearStore(store)
+	
+	// This should fail because the table has not been created yet
+	_, err := store.db.Exec("SELECT * FROM " + store.tableName)
+	if err == nil {
+		t.Error("Expected an error but got nil")
+	}
+	
+	row, err := store.rowByName("test")
+	if err != nil {
+		t.Errorf("Expected no error but got %s", err)
+	}
+	if row != nil {
+		t.Error("Expected no data but got", row)
+	}
+
+	// Now this should succeed because the table has been created	
+	_, err = store.db.Exec("SELECT * FROM " + store.tableName)
+	if err != nil {
+		t.Errorf("Expected no error but got %s", err)
+	}
+	
+	store.SetString("name", "lau")
+	row, err = store.rowByName("name")
+	if err != nil {
+		t.Errorf("Expected no error but got %s", err)
+	}
+	if row == nil {
+		t.Error("Expected data but got nil")
+	}
 }
 
 func Test_GetSetString(t *testing.T) {
@@ -97,8 +131,12 @@ func Test_GetSetInt(t *testing.T) {
 		t.Errorf("Expected 1234, got %d", i)
 	}
 	
-	store.SetString("test", "abcd")
+	i = store.Int("doesntexist")
+	if i != 0 {
+		t.Errorf("Expected 0, got %d", i)
+	}
 
+	store.SetString("test", "abcd")
 	defer panicHandler(t, "Int: not a number")
 	store.Int("test")
 }
@@ -111,6 +149,11 @@ func Test_GetSetFloat(t *testing.T) {
 	f := store.Float("test")
 	if f != 1234.567 {
 		t.Errorf("Expected 1234.567, got %f", f)
+	}
+	
+	f = store.Float("doesntexist")
+	if f != 0 {
+		t.Errorf("Expected 0, got %f", f)
 	}
 	
 	store.SetString("test", "abcd")

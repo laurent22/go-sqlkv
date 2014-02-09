@@ -22,16 +22,10 @@ func New(db *sql.DB, tableName string) *SqlKv {
 	output := new(SqlKv)
 	output.db = db
 	output.tableName = tableName
-	output.createTableCalled = false
 	return output
 }
 
 func (this *SqlKv) createTable() error {
-	if this.createTableCalled {
-		return nil
-	}
-	
-	this.createTableCalled = true
 	_, err := this.db.Exec("CREATE TABLE IF NOT EXISTS " + this.tableName + " (name TEXT NOT NULL PRIMARY KEY, value TEXT)")
 	if err != nil {
 		return err
@@ -51,18 +45,8 @@ func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
 	} else if err != nil {
 		// If the query failed, it might be because the table hasn't
 		// been created yet, so try to do it now
-		this.createTable()
-		
-		err = this.db.QueryRow(query, name).Scan(&row.name, &row.value)
-		if err == nil {
-			return row, nil
-		}
-		
-		if err == sql.ErrNoRows {
-			return nil, nil
-		} else {
-			return nil, err
-		}
+		err = this.createTable()
+		return nil, err
 	}
 	
 	return row, nil
@@ -90,16 +74,8 @@ func (this *SqlKv) SetString(name string, value string) {
 	}
 	
 	_, err = this.db.Exec(query, value, name)
-	
 	if err != nil {
-		// If the query failed, it might be because the table hasn't
-		// been created yet, so try to do it now
-		this.createTable()
-		
-		_, err = this.db.Exec(query, value, name)
-		if err != nil {
-			panic(err)
-		}
+		panic(err)
 	}
 }
 
@@ -180,7 +156,10 @@ func (this *SqlKv) Del(name string) {
 	if err != nil {
 		// If the query failed, it might be because the table hasn't
 		// been created yet, so try to do it now
-		this.createTable()
+		err = this.createTable()
+		if err != nil {
+			panic(err)
+		}
 		
 		_, err = this.db.Exec(query, name)
 		if err != nil {
