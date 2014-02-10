@@ -5,14 +5,14 @@ import (
 	"os"
 	"testing"
 	"time"
-	
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func getStore() *SqlKv {
 	var err error
 	var db *sql.DB
-	
+
 	os.Mkdir("test", 0777)
 
 	os.Remove("test/database.db")
@@ -20,8 +20,8 @@ func getStore() *SqlKv {
 	if err != nil {
 		panic(err)
 	}
-	
-	return New(db, "kvstore")	
+
+	return New(db, "kvstore")
 }
 
 func clearStore(store *SqlKv) {
@@ -41,36 +41,9 @@ func noPanicHandler(t *testing.T, message string) {
 	}
 }
 
-func Test_createTable(t *testing.T) {
-	store := getStore()
-	
-	store.db.Close()
-		
-	err := store.createTable()
-	if err == nil {
-		t.Error("Expected an error, got nil.")
-	}
-	
-	clearStore(store)
-	store = getStore()
-	
-	err = store.createTable()
-	if err != nil {
-		t.Errorf("Expected no error, got %s", err)
-	}
-	
-	clearStore(store)
-}
-
 func Test_rowByName(t *testing.T) {
 	store := getStore()
 	defer clearStore(store)
-	
-	// This should fail because the table has not been created yet
-	_, err := store.db.Exec("SELECT * FROM " + store.tableName)
-	if err == nil {
-		t.Error("Expected an error but got nil")
-	}
 	
 	row, err := store.rowByName("test")
 	if err != nil {
@@ -78,12 +51,6 @@ func Test_rowByName(t *testing.T) {
 	}
 	if row != nil {
 		t.Error("Expected no data but got", row)
-	}
-
-	// Now this should succeed because the table has been created	
-	_, err = store.db.Exec("SELECT * FROM " + store.tableName)
-	if err != nil {
-		t.Errorf("Expected no error but got %s", err)
 	}
 	
 	store.SetString("name", "lau")
@@ -99,13 +66,13 @@ func Test_rowByName(t *testing.T) {
 func Test_GetSetString(t *testing.T) {
 	store := getStore()
 	defer clearStore(store)
-	
+
 	store.SetString("test", "abcd")
 	value := store.String("test")
 	if value != "abcd" {
 		t.Errorf("Expected 'abcd', got '%s'", value)
 	}
-	
+
 	store.SetString("test", "1234")
 	value = store.String("test")
 	if value != "1234" {
@@ -113,7 +80,7 @@ func Test_GetSetString(t *testing.T) {
 	}
 
 	store.db.Close()
-	
+
 	defer panicHandler(t, "String: database is closed")
 	store.String("test")
 
@@ -162,7 +129,7 @@ func Test_GetSetFloat(t *testing.T) {
 	store.Float("test")
 }
 
-func TestGetSetBool(t *testing.T) {
+func Test_GetSetBool(t *testing.T) {
 	store := getStore()
 	defer clearStore(store)
 
@@ -170,12 +137,12 @@ func TestGetSetBool(t *testing.T) {
 	if b {
 		t.Error("Expected false, got true")
 	}
-	
+
 	store.SetBool("test", true)
 	if !store.Bool("test") {
 		t.Error("Expected true, got false")
 	}
-	
+
 	store.SetBool("test", false)
 	if store.Bool("test") {
 		t.Error("Expected false, got true")
@@ -197,7 +164,7 @@ func Test_GetSetTime(t *testing.T) {
 	if v != now {
 		t.Errorf("Expected %s, got %s", now, v)
 	}
-	
+
 	store.SetString("test", "not a date")
 
 	defer panicHandler(t, "Time: not a date")
@@ -210,10 +177,10 @@ func Test_Del(t *testing.T) {
 
 	defer noPanicHandler(t, "Del: deleting non-existant key")
 	store.Del("blabla")
-	
+
 	store.SetString("test", "abcd")
 	store.Del("test")
-	
+
 	value := store.String("test")
 	if value != "" {
 		t.Errorf("Expected '', got '%s'", value)
@@ -231,19 +198,19 @@ func Test_HasKey(t *testing.T) {
 	if store.HasKey("test") {
 		t.Error("Expected false, got true")
 	}
-	
+
 	store.SetString("test", "abcd")
 	if !store.HasKey("test") {
-		t.Error("Expected true, got false")		
+		t.Error("Expected true, got false")
 	}
 
 	store.SetString("test", "")
 	if !store.HasKey("test") {
-		t.Error("Expected true, got false")		
+		t.Error("Expected true, got false")
 	}
-	
+
 	store.Del("test")
 	if store.HasKey("test") {
-		t.Error("Expected false, got true")		
+		t.Error("Expected false, got true")
 	}
 }

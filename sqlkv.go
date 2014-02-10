@@ -8,13 +8,12 @@ import (
 )
 
 type SqlKv struct {
-	db *sql.DB
-	tableName string
-	createTableCalled bool
+	db                *sql.DB
+	tableName         string
 }
 
 type SqlKvRow struct {
-	name string
+	name  string
 	value string
 }
 
@@ -22,6 +21,12 @@ func New(db *sql.DB, tableName string) *SqlKv {
 	output := new(SqlKv)
 	output.db = db
 	output.tableName = tableName
+
+	err := output.createTable()
+	if err != nil {
+		panic(err)
+	}
+
 	return output
 }
 
@@ -40,16 +45,15 @@ func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
 	row := new(SqlKvRow)
 	query := "SELECT name, `value` FROM " + this.tableName + " WHERE name = ?"
 	err := this.db.QueryRow(query, name).Scan(&row.name, &row.value)
-	
-	if err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		// If the query failed, it might be because the table hasn't
-		// been created yet, so try to do it now
-		err = this.createTable()
-		return nil, err
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		} else {
+			return nil, err
+		}
 	}
-	
+
 	return row, nil
 }
 
@@ -67,13 +71,13 @@ func (this *SqlKv) String(name string) string {
 func (this *SqlKv) SetString(name string, value string) {
 	row, err := this.rowByName(name)
 	var query string
-	
+
 	if row == nil && err == nil {
 		query = "INSERT INTO " + this.tableName + " (value, name) VALUES(?, ?)"
 	} else {
 		query = "UPDATE " + this.tableName + " SET value = ? WHERE name = ?"
 	}
-	
+
 	_, err = this.db.Exec(query, value, name)
 	if err != nil {
 		panic(err)
@@ -85,12 +89,12 @@ func (this *SqlKv) Int(name string) int {
 	if s == "" {
 		return 0
 	}
-	
+
 	i, err := strconv.Atoi(s)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return i
 }
 
@@ -104,7 +108,7 @@ func (this *SqlKv) Float(name string) float32 {
 	if s == "" {
 		return 0
 	}
-	
+
 	o, err := strconv.ParseFloat(s, 32)
 	if err != nil {
 		panic(err)
@@ -137,12 +141,12 @@ func (this *SqlKv) Time(name string) time.Time {
 	if s == "" {
 		return time.Time{}
 	}
-	
+
 	t, err := time.Parse(time.RFC3339Nano, s)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return t
 }
 
@@ -155,17 +159,7 @@ func (this *SqlKv) Del(name string) {
 	_, err := this.db.Exec(query, name)
 
 	if err != nil {
-		// If the query failed, it might be because the table hasn't
-		// been created yet, so try to do it now
-		err = this.createTable()
-		if err != nil {
-			panic(err)
-		}
-		
-		_, err = this.db.Exec(query, name)
-		if err != nil {
-			panic(err)
-		}
+		panic(err)
 	}
 }
 
