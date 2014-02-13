@@ -7,9 +7,16 @@ import (
 	"time"
 )
 
+const (
+	PLACEHOLDER_QUESTION_MARK = 1
+	PLACEHOLDER_DOLLAR        = 2
+)
+
 type SqlKv struct {
-	db                *sql.DB
-	tableName         string
+	db              *sql.DB
+	tableName       string
+	driverName      string
+	placeholderType int
 }
 
 type SqlKvRow struct {
@@ -21,6 +28,7 @@ func New(db *sql.DB, tableName string) *SqlKv {
 	output := new(SqlKv)
 	output.db = db
 	output.tableName = tableName
+	output.placeholderType = PLACEHOLDER_QUESTION_MARK
 
 	err := output.createTable()
 	if err != nil {
@@ -30,20 +38,37 @@ func New(db *sql.DB, tableName string) *SqlKv {
 	return output
 }
 
+func (this *SqlKv) SetDriverName(n string) {
+	this.driverName = n
+	if this.driverName == "postgres" {
+		this.placeholderType = PLACEHOLDER_DOLLAR
+	} else {
+		this.placeholderType = PLACEHOLDER_QUESTION_MARK
+	}
+}
+
 func (this *SqlKv) createTable() error {
 	_, err := this.db.Exec("CREATE TABLE IF NOT EXISTS " + this.tableName + " (name TEXT NOT NULL PRIMARY KEY, value TEXT)")
 	if err != nil {
 		return err
 	}
-	
+
 	// Ignore error here since there will be one if the index already exists
 	this.db.Exec("CREATE INDEX name_index ON " + this.tableName + " (name)")
 	return nil
 }
 
+func (this *SqlKv) placeholder(index int) string {
+	if this.placeholderType == PLACEHOLDER_QUESTION_MARK {
+		return "?"
+	} else {
+		return "$" + strconv.Itoa(index)
+	}
+}
+
 func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
 	row := new(SqlKvRow)
-	query := "SELECT name, `value` FROM " + this.tableName + " WHERE name = ?"
+	query := "SELECT name, value FROM " + this.tableName + " WHERE name = " + this.placeholder(1)
 	err := this.db.QueryRow(query, name).Scan(&row.name, &row.value)
 
 	if err != nil {
@@ -73,9 +98,9 @@ func (this *SqlKv) SetString(name string, value string) {
 	var query string
 
 	if row == nil && err == nil {
-		query = "INSERT INTO " + this.tableName + " (value, name) VALUES(?, ?)"
+		query = "INSERT INTO " + this.tableName + " (value, name) VALUES(" + this.placeholder(1) + ", " + this.placeholder(2) + ")"
 	} else {
-		query = "UPDATE " + this.tableName + " SET value = ? WHERE name = ?"
+		query = "UPDATE " + this.tableName + " SET value = " + this.placeholder(1) + " WHERE name = " + this.placeholder(2)
 	}
 
 	_, err = this.db.Exec(query, value, name)
@@ -155,7 +180,7 @@ func (this *SqlKv) SetTime(name string, value time.Time) {
 }
 
 func (this *SqlKv) Del(name string) {
-	query := "DELETE FROM " + this.tableName + " WHERE name = ?"
+	query := "DELETE FROM " + this.tableName + " WHERE name = " + this.placeholder(1)
 	_, err := this.db.Exec(query, name)
 
 	if err != nil {
