@@ -246,4 +246,29 @@ func Test_All(t *testing.T) {
 			t.Error("Not found:", expectedKv)
 		}
 	}
+	
+	store.Clear()
+	all = store.All()
+	if len(all) != 0 {
+		t.Errorf("Expected 0 rows")
+	}
+}
+
+func Test_Placeholder(t *testing.T) {
+	store := getStore()
+	defer clearStore(store)
+	
+	if store.placeholder(0) != "?" || store.placeholder(1) != "?" {
+		t.Error("Incorrect placeholder")
+	}
+	
+	store.SetDriverName("postgres")
+	if store.placeholder(1) != "$1" || store.placeholder(2) != "$2" {
+		t.Error("Incorrect placeholder")
+	}
+
+	store.SetDriverName("sqlite3")	
+	if store.placeholder(0) != "?" || store.placeholder(1) != "?" {
+		t.Error("Incorrect placeholder")
+	}
 }
