@@ -208,6 +208,15 @@ func (this *SqlKv) Del(name string) {
 	}
 }
 
+func (this *SqlKv) Clear() {
+	query := "DELETE FROM " + this.tableName
+	_, err := this.db.Exec(query)
+
+	if err != nil {
+		panic(err)
+	}
+}
+
 func (this *SqlKv) HasKey(name string) bool {
 	row, err := this.rowByName(name)
 	if row == nil && err == nil {
