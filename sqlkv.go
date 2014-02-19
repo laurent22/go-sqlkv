@@ -69,7 +69,7 @@ func (this *SqlKv) placeholder(index int) string {
 func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
 	row := new(SqlKvRow)
 	query := "SELECT name, value FROM " + this.tableName + " WHERE name = " + this.placeholder(1)
-	err := this.db.QueryRow(query, name).Scan(&row.name, &row.value)
+	err := this.db.QueryRow(query, name).Scan(&row.Name, &row.Value)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
