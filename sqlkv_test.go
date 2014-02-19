@@ -214,3 +214,36 @@ func Test_HasKey(t *testing.T) {
 		t.Error("Expected false, got true")
 	}
 }
+
+func Test_All(t *testing.T) {
+	store := getStore()
+	defer clearStore(store)
+	
+	store.SetString("test", "abcd")
+	store.SetInt("num", 1234)
+	store.SetBool("boolean", true)
+	
+	all := store.All()
+	if len(all) != 3 {
+		t.Errorf("Expected 3 rows, got %d", len(all))
+	}
+	
+	expected := []SqlKvRow{
+		SqlKvRow{ Name: "test", Value: "abcd", },
+		SqlKvRow{ Name: "num", Value: "1234", },
+		SqlKvRow{ Name: "boolean", Value: "1", },
+	}
+	
+	for _, expectedKv := range expected {
+		var found bool
+		for _, kv := range all {
+			if kv.Name == expectedKv.Name && kv.Value == expectedKv.Value {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Error("Not found:", expectedKv)
+		}
+	}
+}

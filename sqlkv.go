@@ -13,8 +13,8 @@ type SqlKv struct {
 }
 
 type SqlKvRow struct {
-	name  string
-	value string
+	Name  string
+	Value string
 }
 
 func New(db *sql.DB, tableName string) *SqlKv {
@@ -44,7 +44,7 @@ func (this *SqlKv) createTable() error {
 func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
 	row := new(SqlKvRow)
 	query := "SELECT name, `value` FROM " + this.tableName + " WHERE name = ?"
-	err := this.db.QueryRow(query, name).Scan(&row.name, &row.value)
+	err := this.db.QueryRow(query, name).Scan(&row.Name, &row.Value)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -57,6 +57,26 @@ func (this *SqlKv) rowByName(name string) (*SqlKvRow, error) {
 	return row, nil
 }
 
+func (this *SqlKv) All() []SqlKvRow {
+	rows, err := this.db.Query("SELECT name, `value` FROM " + this.tableName)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []SqlKvRow{}
+		} else {
+			panic(err)
+		}
+	}
+
+	var output []SqlKvRow
+	for rows.Next() {
+		var kvRow SqlKvRow
+		rows.Scan(&kvRow.Name, &kvRow.Value)
+		output = append(output, kvRow)
+	}
+	
+	return output
+}
+
 func (this *SqlKv) String(name string) string {
 	row, err := this.rowByName(name)
 	if err == nil && row == nil {
@@ -65,7 +85,7 @@ func (this *SqlKv) String(name string) string {
 	if err != nil {
 		panic(err)
 	}
-	return row.value
+	return row.Value
 }
 
 func (this *SqlKv) SetString(name string, value string) {
