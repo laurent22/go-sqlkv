@@ -161,7 +161,7 @@ func Test_GetSetTime(t *testing.T) {
 	now := time.Now()
 	store.SetTime("test", now)
 	v = store.Time("test")
-	if v != now {
+	if v.Format(time.Stamp) != now.Format(time.Stamp) {
 		t.Errorf("Expected %s, got %s", now, v)
 	}
 
