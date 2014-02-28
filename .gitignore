@@ -1,1 +1,3 @@
-example/example.db
+example/sqlite3/example.db
+test.db
+test.out

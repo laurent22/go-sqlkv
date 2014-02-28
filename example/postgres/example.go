@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 	
-	sqlkv ".."
+	sqlkv "github.com/laurent22/go-sqlkv"
 	_ "github.com/lib/pq"
 )
 
