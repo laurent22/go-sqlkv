@@ -1,5 +1,7 @@
 # An SQL-based key/value store for Golang
 
+[![Build Status](https://travis-ci.org/laurent22/go-sqlkv.png)](https://travis-ci.org/laurent22/go-sqlkv)
+
 SqlKv provides an SQL-based key/value store for Golang. It can work with any of the database types supported by the built-in `database/sql` package.
 
 It can be used, for example, to easily store configuration values in Sqlite, or to build a simple caching system when something more advanced like memcached or Redis is not available.
