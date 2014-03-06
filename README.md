@@ -1,16 +1,14 @@
-# An SQL-based key/value store for Golang
-
-[![Build Status](https://travis-ci.org/laurent22/go-sqlkv.png)](https://travis-ci.org/laurent22/go-sqlkv)
+## SQL-based key/value store for Golang [![Build Status](https://travis-ci.org/laurent22/go-sqlkv.png)](https://travis-ci.org/laurent22/go-sqlkv)
 
 SqlKv provides an SQL-based key/value store for Golang. It can work with any of the database types supported by the built-in `database/sql` package.
 
 It can be used, for example, to easily store configuration values in Sqlite, or to build a simple caching system when something more advanced like memcached or Redis is not available.
 
-# Installation
+## Installation
 
 	go get github.com/laurent22/go-sqlkv
 	
-# Usage
+## Usage
 
 The first step is to initialize a new database connection. The package expects the connection to remain open while being used. For example, using Sqlite:
 
@@ -48,11 +46,22 @@ If a key is missing, each Get method will return Golang's default zero value for
 
 You can use `HasKey` to check if a key really exists. The method `Del` is also available to delete a key.
 
-# API reference
+## Postgres support
+
+To use the library with Postgres, you need to specify the driver name just after having created the store object:
+
+```go
+store := sqlkv.New(db, "kvstore")
+store.SetDriverName("postgres")
+```
+
+A more detailed example is in [example/postgres/example.go](example/postgres/example.go)
+
+## API reference
 
 http://godoc.org/github.com/laurent22/go-sqlkv
 
-# Full example
+## Full example
 
 ```go
 package main
@@ -101,6 +110,6 @@ func main() {
 }
 ```
 
-# License
+## License
 
 MIT
