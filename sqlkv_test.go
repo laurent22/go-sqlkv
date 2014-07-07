@@ -44,7 +44,7 @@ func noPanicHandler(t *testing.T, message string) {
 func Test_rowByName(t *testing.T) {
 	store := getStore()
 	defer clearStore(store)
-	
+
 	row, err := store.rowByName("test")
 	if err != nil {
 		t.Errorf("Expected no error but got %s", err)
@@ -52,7 +52,7 @@ func Test_rowByName(t *testing.T) {
 	if row != nil {
 		t.Error("Expected no data but got", row)
 	}
-	
+
 	store.SetString("name", "lau")
 	row, err = store.rowByName("name")
 	if err != nil {
@@ -97,7 +97,7 @@ func Test_GetSetInt(t *testing.T) {
 	if i != 1234 {
 		t.Errorf("Expected 1234, got %d", i)
 	}
-	
+
 	i = store.Int("doesntexist")
 	if i != 0 {
 		t.Errorf("Expected 0, got %d", i)
@@ -117,12 +117,12 @@ func Test_GetSetFloat(t *testing.T) {
 	if f != 1234.567 {
 		t.Errorf("Expected 1234.567, got %f", f)
 	}
-	
+
 	f = store.Float("doesntexist")
 	if f != 0 {
 		t.Errorf("Expected 0, got %f", f)
 	}
-	
+
 	store.SetString("test", "abcd")
 
 	defer panicHandler(t, "Float: not a number")
@@ -218,22 +218,22 @@ func Test_HasKey(t *testing.T) {
 func Test_All(t *testing.T) {
 	store := getStore()
 	defer clearStore(store)
-	
+
 	store.SetString("test", "abcd")
 	store.SetInt("num", 1234)
 	store.SetBool("boolean", true)
-	
+
 	all := store.All()
 	if len(all) != 3 {
 		t.Errorf("Expected 3 rows, got %d", len(all))
 	}
-	
+
 	expected := []SqlKvRow{
-		SqlKvRow{ Name: "test", Value: "abcd", },
-		SqlKvRow{ Name: "num", Value: "1234", },
-		SqlKvRow{ Name: "boolean", Value: "1", },
+		SqlKvRow{Name: "test", Value: "abcd"},
+		SqlKvRow{Name: "num", Value: "1234"},
+		SqlKvRow{Name: "boolean", Value: "1"},
 	}
-	
+
 	for _, expectedKv := range expected {
 		var found bool
 		for _, kv := range all {
@@ -246,7 +246,7 @@ func Test_All(t *testing.T) {
 			t.Error("Not found:", expectedKv)
 		}
 	}
-	
+
 	store.Clear()
 	all = store.All()
 	if len(all) != 0 {
@@ -257,18 +257,54 @@ func Test_All(t *testing.T) {
 func Test_Placeholder(t *testing.T) {
 	store := getStore()
 	defer clearStore(store)
-	
+
 	if store.placeholder(0) != "?" || store.placeholder(1) != "?" {
 		t.Error("Incorrect placeholder")
 	}
-	
+
 	store.SetDriverName("postgres")
 	if store.placeholder(1) != "$1" || store.placeholder(2) != "$2" {
 		t.Error("Incorrect placeholder")
 	}
 
-	store.SetDriverName("sqlite3")	
+	store.SetDriverName("sqlite3")
 	if store.placeholder(0) != "?" || store.placeholder(1) != "?" {
 		t.Error("Incorrect placeholder")
+	}
+}
+
+func Test_DefaultValues(t *testing.T) {
+	store := getStore()
+	defer clearStore(store)
+
+	b := store.BoolD("nothing", false)
+	if b {
+		t.Fatal()
+	}
+
+	b = store.BoolD("nothing", true)
+	if !b {
+		t.Fatal()
+	}
+
+	s := store.StringD("nothing", "something")
+	if s != "something" {
+		t.Fatal()
+	}
+
+	i := store.IntD("nothing", 123)
+	if i != 123 {
+		t.Fatal()
+	}
+
+	f := store.FloatD("nothing", 3.14)
+	if f != 3.14 {
+		t.Fatal()
+	}
+
+	defaultTime, _ := time.Parse("2006-Jan-02", "2013-Feb-03")
+	tim := store.TimeD("nothing", defaultTime)
+	if tim.Year() != 2013 || tim.Month() != 2 || tim.Day() != 3 {
+		t.Fatal()
 	}
 }

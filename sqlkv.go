@@ -98,7 +98,7 @@ func (this *SqlKv) All() []SqlKvRow {
 		rows.Scan(&kvRow.Name, &kvRow.Value)
 		output = append(output, kvRow)
 	}
-	
+
 	return output
 }
 
@@ -111,6 +111,13 @@ func (this *SqlKv) String(name string) string {
 		panic(err)
 	}
 	return row.Value
+}
+
+func (this *SqlKv) StringD(name string, defaultValue string) string {
+	if !this.HasKey(name) {
+		return defaultValue
+	}
+	return this.String(name)
 }
 
 func (this *SqlKv) SetString(name string, value string) {
@@ -143,6 +150,13 @@ func (this *SqlKv) Int(name string) int {
 	return i
 }
 
+func (this *SqlKv) IntD(name string, defaultValue int) int {
+	if !this.HasKey(name) {
+		return defaultValue
+	}
+	return this.Int(name)
+}
+
 func (this *SqlKv) SetInt(name string, value int) {
 	s := strconv.Itoa(value)
 	this.SetString(name, s)
@@ -161,6 +175,13 @@ func (this *SqlKv) Float(name string) float32 {
 	return float32(o)
 }
 
+func (this *SqlKv) FloatD(name string, defaultValue float32) float32 {
+	if !this.HasKey(name) {
+		return defaultValue
+	}
+	return this.Float(name)
+}
+
 func (this *SqlKv) SetFloat(name string, value float32) {
 	s := strconv.FormatFloat(float64(value), 'g', -1, 32)
 	this.SetString(name, s)
@@ -169,6 +190,13 @@ func (this *SqlKv) SetFloat(name string, value float32) {
 func (this *SqlKv) Bool(name string) bool {
 	s := this.String(name)
 	return s == "1" || strings.ToLower(s) == "true"
+}
+
+func (this *SqlKv) BoolD(name string, defaultValue bool) bool {
+	if !this.HasKey(name) {
+		return defaultValue
+	}
+	return this.Bool(name)
 }
 
 func (this *SqlKv) SetBool(name string, value bool) {
@@ -193,6 +221,13 @@ func (this *SqlKv) Time(name string) time.Time {
 	}
 
 	return t
+}
+
+func (this *SqlKv) TimeD(name string, defaultValue time.Time) time.Time {
+	if !this.HasKey(name) {
+		return defaultValue
+	}
+	return this.Time(name)
 }
 
 func (this *SqlKv) SetTime(name string, value time.Time) {

@@ -34,6 +34,14 @@ The value can then be retrived and set using the provided methods:
 - `Bool(name)` / `SetBool(name, value)`
 - `Time(name)` / `SetTime(name, value)`
 
+When getting a value, a default value can be provided using the alternative `<Type>D()` methods:
+
+- `StringD(name, "some default")`
+- `IntD(name, 12345)`
+- `FloatD(name, 3.14)`
+- `BoolD(name, true)`
+- `TimeD(name, time.Now())`
+
 In order to keep the API simple, all the errors are handled internally when possible. If an error cannot be handled (eg. cannot read or write to the database), the method will panic.
 
 If a key is missing, each Get method will return Golang's default zero value for this type. The zero values are:
